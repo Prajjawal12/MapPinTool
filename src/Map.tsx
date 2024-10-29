@@ -15,7 +15,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MapPin, Search, X, List, Map as MapIcon } from 'lucide-react';
+import { MapPin, X, List, Map as MapIcon } from 'lucide-react';
+
+// Define the Pin type
+interface Pin {
+  id: string;
+  lat: number;
+  lng: number;
+  remark: string;
+  address: string;
+}
 
 const customIcon = L.icon({
   iconUrl:
@@ -25,7 +34,11 @@ const customIcon = L.icon({
   popupAnchor: [0, -32],
 });
 
-function MapEvents({ onMapClick }) {
+function MapEvents({
+  onMapClick,
+}: {
+  onMapClick: (e: L.LeafletMouseEvent) => void;
+}) {
   useMapEvents({
     click: onMapClick,
   });
@@ -161,8 +174,8 @@ export default function Component() {
             </div>
           </div>
           <Button
-            variant="ghost"
-            size="icon"
+            variant="outline"
+            size="medium"
             onClick={() => handlePinDelete(pin.id)}
             className="ml-2 text-gray-400 hover:text-red-500"
           >
@@ -244,36 +257,26 @@ export default function Component() {
             {isMobile && (
               <Button
                 variant="outline"
-                size="icon"
+                size="small"
                 onClick={() =>
                   setViewMode(viewMode === 'list' ? 'map' : 'list')
                 }
                 className="md:hidden"
               >
-                {viewMode === 'list' ? (
-                  <MapIcon size={20} />
-                ) : (
-                  <List size={20} />
-                )}
+                {viewMode === 'list' ? <MapIcon /> : <List />}
               </Button>
             )}
           </div>
-          <div className="flex-1 overflow-auto">
-            <Input
-              type="text"
-              placeholder="Search pins..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="mb-4 p-2 bg-gray-700 text-white"
-            />
-            <ScrollArea style={{ height: 'calc(100% - 60px)' }}>
-              {filteredPins.length > 0 ? (
-                filteredPins.map(renderPinCard)
-              ) : (
-                <p className="text-gray-400">No pins found.</p>
-              )}
-            </ScrollArea>
-          </div>
+          <Input
+            type="text"
+            placeholder="Search pins..."
+            className="mb-4"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <ScrollArea className="flex-1">
+            {filteredPins.map(renderPinCard)}
+          </ScrollArea>
         </CardContent>
       </Card>
     </div>
